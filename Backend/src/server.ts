@@ -1,6 +1,9 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import http from "http";
 import app from "./app";
+import { initSocket } from "./utils/socket"; // adjust path if needed
+import { startDocumentSubscriber } from "./subscribers/document.subscriber";
 
 dotenv.config();
 
@@ -13,12 +16,18 @@ const startServer = async () => {
     }
 
     await mongoose.connect(process.env.MONGO_URI);
-
     console.log(" MongoDB Connected");
 
-    app.listen(PORT, () => {
+    const server = http.createServer(app);
+
+
+    initSocket(server);
+
+    startDocumentSubscriber()
+    server.listen(PORT, () => {
       console.log(` Server running on port ${PORT}`);
     });
+
   } catch (error) {
     console.error("Server Error:", error);
     process.exit(1);

@@ -1,9 +1,8 @@
 import express from "express";
 import cors from "cors"
 import authRoutes from "./routes/auth.routes";
-// import tripRoutes  from "./routes/trip.routes";
-// import aiRoutes from "./routes/ai.routes";
-
+import documentRoutes from "./routes/document.routes"
+import chatRoutes from "./routes/chat.routes"
 import { errorHandler } from "./middleware/error.middleware";
 const app = express();
 
@@ -13,8 +12,8 @@ app.use(express.json());
 
 app.use(errorHandler)
 app.use("/api/auth", authRoutes);
-// app.use("/api/trips", tripRoutes);
-// app.use("/api/ai", aiRoutes);
+app.use("/api/documents", documentRoutes);
+app.use("/api/chats", chatRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running...");
