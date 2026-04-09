@@ -1,7 +1,9 @@
-import { Request, Response } from "express";
+import {  Response } from "express";
+import { AuthRequest } from "../middleware/auth.middleware";
+
 import { askQuestionService } from "../services/chat.service";
 
-export const askQuestion = async (req: Request, res: Response) => {
+export const askQuestion = async (req: AuthRequest, res: Response) => {
   try {
     const { userId, documentId, question } = req.body;
 

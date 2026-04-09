@@ -2,7 +2,9 @@ import Groq from "groq-sdk";
 import { retrieveRelevantChunks } from "./retrieval.service";
 import { ChatModel } from "../models/chat.model";
 import * as chatRepo from "../repository/chat.repository";
+import dotenv from "dotenv";
 
+dotenv.config();
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY! });
 
 export const askQuestionService = async (

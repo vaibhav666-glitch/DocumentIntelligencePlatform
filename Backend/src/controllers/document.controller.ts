@@ -1,5 +1,6 @@
 import { Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware";
+
 import * as postDocService from "../services/document.service";
 
 export const postDocumentController = async (req: AuthRequest, res: Response) => {

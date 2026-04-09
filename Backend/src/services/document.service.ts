@@ -16,13 +16,13 @@ export const postDocumentService = async (data: any) => {
 
     const io = getIO();
 
-    // 2️⃣ Emit initial status
+ 
     io.to(data.userId.toString()).emit("document-status", {
       documentId: doc._id,
       status: "processing",
     });
 
-    // 3️⃣ Add job with retry config 🔥
+    
     await documentQueue.add(
       "process-document",
       {
@@ -31,13 +31,13 @@ export const postDocumentService = async (data: any) => {
         userId: data.userId,
       },
       {
-        attempts: 3, // retry 3 times
+        attempts: 3,
         backoff: {
           type: "exponential",
           delay: 2000,
         },
         removeOnComplete: true,
-        removeOnFail: false, // keep failed jobs for debugging
+        removeOnFail: false, 
       }
     );
 
