@@ -16,8 +16,7 @@ const DocumentChatPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const [readyUrl, setReadyUrl] = useState(null);
-
+  const [readyUrl, setReadyUrl] = useState<string | null>(null);
 useEffect(() => {
   if (doc?.fileUrl) {
     const timer = setTimeout(() => {
