@@ -24,7 +24,7 @@ const FileUploadModal: React.FC<Props> = ({ isOpen, onClose }) => {
         setStatus("Processing...");
       } else if (data.status === "ready") {
         setStatus("✅ Ready");
-        setTimeout(()=>{onClose},4000)
+        setTimeout(()=>{onClose()},2000)
       } else if (data.status === "failed") {
         {setStatus("❌ Failed");
          setError(data?.failureReason)
@@ -199,7 +199,7 @@ const FileUploadModal: React.FC<Props> = ({ isOpen, onClose }) => {
             </span>{" "}
             or drag &amp; drop
             <br />
-            PDF, DOCX, TXT — up to 20MB
+            PDF, DOCX, TXT — up to 10MB
           </p>
         )}
       </div>
