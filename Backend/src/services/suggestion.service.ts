@@ -62,17 +62,15 @@ If you add anything else, the output is invalid.
 
   const raw = completion.choices[0]?.message?.content || "";
 
-  
-  const suggestions = raw
-    .split("\n")
-    .map((q) =>
-      q
-        .replace(/^[-•*\d.\s]+/, "") // remove bullets, numbers
-        .trim()
-    )
-    .filter((q) => q.length > 0);
+  let suggestions: string[] = [];
 
-  return suggestions;
+try {
+  suggestions = JSON.parse(raw);
+} catch (err) {
+  console.error("JSON parse failed:", raw);
+}
+
+return suggestions;
 };
 
 export const getFollowUpSuggestions = async (
@@ -124,7 +122,7 @@ Based on the question, answer, and context, generate 4 relevant follow-up questi
 - No extra words
 - No intro or outro text
 Return ONLY valid JSON:
-["question1", "question2", "question3", "question4", "question5"]
+["question1", "question2", "question3", "question4"]
 If you add anything else, the output is invalid.
 `
       },
@@ -144,16 +142,37 @@ ${answer}
     ],
   });
 
-  const raw = completion.choices[0]?.message?.content || "";
+ const raw = completion.choices[0]?.message?.content || "";
 
-  const suggestions = raw
-    .split(/\n|\r/)
+let suggestions: string[] = [];
+
+try {
+  suggestions = JSON.parse(raw);
+} catch (err) {
+  console.warn("JSON parse failed, fallback used:", raw);
+
+  suggestions = raw
+    .split("\n")
     .map((q) =>
       q
         .replace(/^[-•*\d.\)\s]+/, "")
+        .replace(/^["\[\],]+|["\[\],]+$/g, "")
         .trim()
     )
-    .filter((q) => q.length > 5);
+    .filter((q) => q.length > 10)
+    .slice(0, 4);
+}
 
-  return suggestions;
+// guarantee always 4
+if (suggestions.length < 4) {
+  suggestions = [
+    ...suggestions,
+    "What are the key takeaways?",
+    "Can you explain this in simpler terms?",
+    "What are the main points discussed?",
+    "Are there any important details to note?",
+  ].slice(0, 4);
+}
+
+return suggestions;
 };
