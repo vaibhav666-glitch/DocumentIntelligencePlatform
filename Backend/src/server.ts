@@ -2,10 +2,12 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import http from "http";
 import app from "./app";
-import { initSocket } from "./utils/socket";
+import { initSocket } from "./utils/socket"; // adjust path if needed
 import { startDocumentSubscriber } from "./subscribers/document.subscriber";
 
 dotenv.config();
+
+const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
@@ -14,17 +16,16 @@ const startServer = async () => {
     }
 
     await mongoose.connect(process.env.MONGO_URI);
-    console.log("MongoDB Connected");
+    console.log(" MongoDB Connected");
 
     const server = http.createServer(app);
 
-    initSocket(server);
-    startDocumentSubscriber();
 
-    const PORT = process.env.PORT || 5000;
-console.log("ENV PORT:", process.env.PORT);
-    server.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server running on port ${PORT}`);
+    initSocket(server);
+
+    startDocumentSubscriber()
+    server.listen(PORT, () => {
+      console.log(` Server running on port ${PORT}`);
     });
 
   } catch (error) {
