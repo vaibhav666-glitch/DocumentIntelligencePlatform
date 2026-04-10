@@ -39,14 +39,19 @@ export const getInitialSuggestions = async (
     messages: [
       {
         role: "system",
-        content: `
-Generate 5 useful questions a user might ask about this document.
+     content: `
+Generate EXACTLY 5 questions from the given text.
 
-Rules:
-- Be specific
-- Keep them short
-- Return ONLY bullet points (no explanation)
-        `,
+STRICT FORMAT:
+- Only plain questions
+- One question per line
+- No bullets, no numbering
+- No extra words
+- No intro or outro text
+Return ONLY valid JSON:
+["question1", "question2", "question3", "question4", "question5"]
+If you add anything else, the output is invalid.
+`,
       },
       {
         role: "user",
@@ -57,7 +62,7 @@ Rules:
 
   const raw = completion.choices[0]?.message?.content || "";
 
-  // 🔥 Convert to array
+  
   const suggestions = raw
     .split("\n")
     .map((q) =>
@@ -91,7 +96,7 @@ export const getFollowUpSuggestions = async (
     embeddingKey: "embedding",
   });
 
-  // 🔥 Use similarity search with working filter
+  
   const docs = await vectorStore.similaritySearch(question, 5, {
     userDocKey: `${userId}_${documentId}`,
   });
@@ -109,12 +114,19 @@ export const getFollowUpSuggestions = async (
         content: `
 Based on the question, answer, and context, generate 4 relevant follow-up questions.
 
-Rules:
+ STRICT FORMAT:
+- Only plain questions
 - Do NOT repeat the original question
 - Make them deeper or related
 - Keep them short
-- Return ONLY bullet points
-        `,
+- One question per line
+- No bullets, no numbering
+- No extra words
+- No intro or outro text
+Return ONLY valid JSON:
+["question1", "question2", "question3", "question4", "question5"]
+If you add anything else, the output is invalid.
+`
       },
       {
         role: "user",
@@ -134,7 +146,6 @@ ${answer}
 
   const raw = completion.choices[0]?.message?.content || "";
 
-  // 🔥 Convert to array
   const suggestions = raw
     .split(/\n|\r/)
     .map((q) =>

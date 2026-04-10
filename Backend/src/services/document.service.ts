@@ -57,3 +57,34 @@ export const postDocumentService = async (data: any) => {
   throw new Error(err.message);
 }
 };
+
+
+export const getAllDocumentService = async (userId: string) => {
+  try {
+    const resp = await documentRepo.getAllDocument(userId);
+    return resp; 
+  } catch (err) {
+    console.error("service error", err);
+    throw err;
+  }
+};
+
+export const getDocumentServiceById = async (userId: string,documentId:string) => {
+  try {
+    const resp = await documentRepo.getDocumentById(userId,documentId);
+    return resp; 
+  } catch (err) {
+    console.error("service error", err);
+    throw err;
+  }
+};
+
+export const deleteDocumentServiceById = async (userId: string,documentId:string) => {
+  try {
+    const resp = await documentRepo.deleteDocumentById(userId,documentId);
+    return resp; 
+  } catch (err) {
+    console.error("service error", err);
+    throw err;
+  }
+};

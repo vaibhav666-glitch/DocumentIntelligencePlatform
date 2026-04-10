@@ -5,7 +5,7 @@ import mammoth from "mammoth";
 import { pub } from "../utils/redis";
 import { DocumentModel } from "../models/document.model";
 import { processDocumentWithLangchain } from "../services/langchain.service";
-import pptx2json from "pptx2json";
+import PptxParser from "node-pptx-parser";
 import fs from "fs";
 import path from "path";
 import os from "os";
@@ -25,7 +25,7 @@ function classifyError(error: any) {
     return "UNSUPPORTED_FILE";
   }
 
-  if (msg.includes("no text")) {
+  if (msg.includes("no text") || msg.includes("empty_document")) {
     return "EMPTY_DOCUMENT";
   }
 
@@ -74,19 +74,30 @@ export const documentWorker = async () => {
           } else if (fileUrl.endsWith(".docx")) {
             const result = await mammoth.extractRawText({ buffer });
             text = result.value;
-          } else if (fileUrl.endsWith(".pptx")) {
-            const tempPath = path.join(os.tmpdir(), `${Date.now()}.pptx`);
-            fs.writeFileSync(tempPath, buffer);
+          } 
+        else if (fileUrl.endsWith(".pptx")) {
+        const tempPath = path.join(os.tmpdir(), `${Date.now()}.pptx`);
+          fs.writeFileSync(tempPath, buffer);
 
-            const result = await pptx2json.parse(tempPath);
-            text = result.slides
-              ?.map((slide: any) =>
-                slide.shapes?.map((shape: any) => shape.text).join(" ")
-              )
-              .join("\n");
+        console.log("tempPath", tempPath);
 
-            fs.unlinkSync(tempPath);
-          } else if (fileUrl.endsWith(".ppt")) {
+  // parse pptx
+  const parser = new PptxParser(tempPath);
+       const slides = await parser.extractText();
+
+    text = slides
+      .map((slide: any) => {
+        const content = Array.isArray(slide.text) ? slide.text.join(" ") : "";
+        return `Slide ${slide.id}: ${content}`;
+      })
+      .join("\n\n");
+
+  console.log("am text ",text)
+
+  fs.unlinkSync(tempPath);
+}
+          
+          else if (fileUrl.endsWith(".ppt")) {
             throw new Error("UNSUPPORTED_FILE");
           } else {
             throw new Error("UNSUPPORTED_FILE");
@@ -112,6 +123,7 @@ export const documentWorker = async () => {
               userId,
               documentId,
               status: "ready",
+              failureReason: null
             })
           );
 
@@ -133,6 +145,7 @@ export const documentWorker = async () => {
                 userId,
                 documentId,
                 status: "failed",
+                failureReason: reason,
               })
             );
 
@@ -153,6 +166,7 @@ export const documentWorker = async () => {
                 userId,
                 documentId,
                 status: "failed",
+                failureReason: reason,
               })
             );
           }

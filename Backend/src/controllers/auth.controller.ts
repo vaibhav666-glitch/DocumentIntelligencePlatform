@@ -20,9 +20,9 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    const token = await authService.loginUser(email, password);
+    const data = await authService.loginUser(email, password);
 
-    res.json({ token });
+    res.json( data );
   } catch (error: any) {
     res.status(400).json({ message: error.message });
   }

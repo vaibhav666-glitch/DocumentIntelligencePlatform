@@ -9,7 +9,7 @@ router.get(
   verifyToken,
   initialSuggestion
 );
-router.get(
+router.post(
   "/followup/:documentId",
   verifyToken,
   followUpSuggestion

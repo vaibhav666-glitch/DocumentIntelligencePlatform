@@ -1,5 +1,5 @@
 import express from "express";
-import { postDocumentController } from "../controllers/document.controller";
+import { postDocument,getAllDocument, getDocumentById, deleteDocumentById } from "../controllers/document.controller";
 import { upload } from "../middleware/upload.middleware";
 import { verifyToken } from "../middleware/auth.middleware";
 
@@ -9,7 +9,26 @@ router.post(
   "/upload",
   verifyToken,
   upload.single("file"), 
-  postDocumentController
+  postDocument
 );
+
+router.get(
+  "/",
+  verifyToken,
+  getAllDocument
+);
+
+router.get(
+  "/:documentId",
+  verifyToken,
+  getDocumentById
+);
+
+router.delete(
+  "/:documentId",
+  verifyToken,
+  deleteDocumentById
+);
+
 
 export default router;

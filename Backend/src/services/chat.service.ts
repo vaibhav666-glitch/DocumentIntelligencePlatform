@@ -29,9 +29,8 @@ export const askQuestionService = async (
   const chunks = rawResults.slice(0, 5);
 
   const context = chunks
-    .map((doc, i) => `Chunk ${i + 1}:\n${doc.pageContent}`)
-    .join("\n\n");
-
+  .map((doc) => doc.pageContent)
+  .join("\n\n");
 
   const history = await ChatModel.find({
     userId,
@@ -52,10 +51,20 @@ export const askQuestionService = async (
     {
       role: "system",
       content: `
-You are a strict document assistant.
-Answer ONLY from context.
-If not found, say "I don't know based on the document."
-      `,
+You are a helpful document assistant.
+
+Answer ONLY using the provided context.
+
+Do NOT mention:
+- "chunk"
+- "context"
+- "document sections"
+- or any internal references
+
+Answer naturally as if you already know the information.
+
+If the answer is not found, say:
+"I don't know based on the document."   `,
     },
     ...formattedHistory,
     {
@@ -75,10 +84,24 @@ If not found, say "I don't know based on the document."
       completion.choices[0]?.message?.content || "No response";
 
    
-    await chatRepo.createChat([
-      { userId, documentId, role: "user", content: question },
-      { userId, documentId, role: "assistant", content: fullAnswer },
-    ]);
+   const base = Date.now();
+
+await chatRepo.createChat([
+  {
+    userId,
+    documentId,
+    role: "user",
+    content: question,
+    sequence: base,
+  },
+  {
+    userId,
+    documentId,
+    role: "assistant",
+    content: fullAnswer,
+    sequence: base + 1, 
+  },
+]);
 
    
     return {
@@ -95,3 +118,14 @@ If not found, say "I don't know based on the document."
     throw new Error("System is busy. Please try again.");
   }
 };
+
+export const getChatHistoryService=async(userId:string,documentId:string)=>{
+  try{
+    const resp=await chatRepo.getChatHistory(userId,documentId)
+  return resp
+  }
+  catch (err) {
+    console.error("service error", err);
+    throw err;
+}
+}

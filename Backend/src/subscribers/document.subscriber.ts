@@ -8,7 +8,7 @@ export const startDocumentSubscriber = () => {
     if (err) {
       console.error("Redis subscribe error:", err);
     } else {
-      console.log("Subscribed to document-status channel ✅");
+      console.log("Subscribed to document-status channel ");
     }
   });
 
@@ -22,6 +22,7 @@ export const startDocumentSubscriber = () => {
       io.to(data.userId).emit("document-status", {
         documentId: data.documentId,
         status: data.status,
+        failureReason:data.failureReason
       });
     }
   });

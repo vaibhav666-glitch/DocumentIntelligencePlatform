@@ -3,6 +3,7 @@ import { Server } from "socket.io";
 let io: Server;
 
 export const initSocket = (server: any) => {
+  console.log("am getting called")
   io = new Server(server, {
     cors: { origin: "*" },
   });
