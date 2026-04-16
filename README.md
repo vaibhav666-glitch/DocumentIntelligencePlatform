@@ -71,9 +71,17 @@ npm install
 Create `.env`:
 
 ```env
+PORT=
 MONGO_URI=
-REDIS_URL=
+JWT_SECRET=
 GROQ_API_KEY=
+OPENAI_API_KEY=
+CLOUD_NAME=
+CLOUD_API_KEY=
+CLOUD_API_SECRET=
+CLOUDINARY_URL=
+REDIS_URL=
+HF_API_KEY=
 ```
 
 ### 4. Run Backend
